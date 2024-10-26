@@ -1,32 +1,22 @@
-use core::panic;
 use std::env;
-use std::fs;
+use std::process;
+
+use cli_practice::Config;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let config = Config::new(&args);
-    println!("Looking for {}", config.query);
-    println!("in {}", config.file_path);
+    // Deal with the err message that Result<_, _> returns
+    let config = Config::build(&args).unwrap_or_else(|err| {
+        println!("Something bad happened. Check your code. Error message: {err}");
+        process::exit(1);
+    });
+    println!("Looking for '{}'", config.query);
+    println!("in '{}'\n", config.file_path);
 
-    let content = fs::read_to_string(config.file_path).unwrap();
-    println!("Read:\n{content}")
+    if let Err(e) = cli_practice::run(config) {
+        println!("Error happened {e}");
+        process::exit(1);
+    };
     // dbg!(args);
-}
-
-struct Config {
-    query: String,
-    file_path: String,
-}
-
-impl Config {
-    fn new(args: &[String]) -> Result<Config, &'static str> {
-        if args.len() < 3 {
-            return Err("Not enough length!");
-        }
-
-        let query = args[1].clone();
-        let file_path = args[2].clone();
-        Ok(Config { query, file_path })
-    }
 }

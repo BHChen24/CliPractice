@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "CliPractice"
+name = "cli_practice"
 version = "0.1.0"
